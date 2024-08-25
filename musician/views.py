@@ -1,25 +1,18 @@
-from django.shortcuts import render,redirect
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView, UpdateView
 from . import models
 from . import forms
-# Create your views here.
-def add_musician(request):
-    if request.method == "POST":
-        musician_form = forms.MusicianForm(request.POST)
-        if musician_form.is_valid():
-            musician_form.save()
-            return redirect('add_musician')
-    else:        
-        musician_form = forms.MusicianForm()
-    return render(request, 'add_musician.html', {"form" : musician_form})
 
+class MusicianCreateView(CreateView):
+    model = models.Musician
+    form_class = forms.MusicianForm
+    template_name = 'add_musician.html'
+    success_url = reverse_lazy('add_musician')
 
-#Edit
-def edit_musician(request, id):
-    musician = models.Musician.objects.get(id=id) #here the name of the pk and id, id is fixed
-    musician_form = forms.MusicianForm(instance=musician)
-    if request.method == "POST":
-        musician_form = forms.MusicianForm(request.POST, instance=musician)
-        if musician_form.is_valid():
-            musician_form.save()
-            return redirect('homepage')
-    return render(request, 'add_musician.html', {"form" : musician_form})
+class MusicianUpdateView(UpdateView):
+    model = models.Musician
+    form_class = forms.MusicianForm
+    template_name = 'add_musician.html'
+    success_url = reverse_lazy('homepage')
+    def get_object(self):
+        return models.Musician.objects.get(id=self.kwargs['id'])

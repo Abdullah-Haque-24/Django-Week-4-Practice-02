@@ -11,7 +11,9 @@
       <th scope="col">Instrument Type</th>
       <th scope="col">Album Name</th>
       <th scope="col">Release Date</th>
+      {% if user.is_authenticated %}
       <th scope="col">Actions</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
@@ -19,7 +21,11 @@
     <tr>
       <th scope="row">{{d.id}}</th>
       <td>
+        {% if user.is_authenticated %}
         <a style="text-decoration: none; color: inherit;" href="{% url 'edit_musician' d.musician.id %}" >{{ d.musician.first_name }} {{ d.musician.last_name }}</a>
+        {% else %}
+        <a style="text-decoration: none; color: inherit;">{{ d.musician.first_name }} {{ d.musician.last_name }}</a>
+        {% endif %}
       </td>
       <td>{{d.musician.email}}</td>
       <td >{{d.rating}}</td>
@@ -27,8 +33,10 @@
       <td>{{d.name}}</td>
       <td>{{d.release_date}}</td> 
       <td>
+        {% if user.is_authenticated %}
         <a href="{% url 'edit_album' d.id %}" class="btn btn-warning">Edit</a>
         <a href="{% url 'delete_album' d.id %}" class="btn btn-danger">Delete</a>
+        {% endif %}
       </td>
     </tr>
     {% endfor %}

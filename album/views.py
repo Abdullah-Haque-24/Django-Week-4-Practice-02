@@ -1,31 +1,30 @@
-from django.shortcuts import render,redirect
-from . import forms
-from . import models
-# Create your views here.
-def add_album(request):
-    if request.method == "POST":
-        album_form = forms.AlbumForm(request.POST)
-        if album_form.is_valid():
-            album_form.save()
-            return redirect('add_album')
-    else:        
-        album_form = forms.AlbumForm()
-    return render(request, 'add_album.html', {"form" : album_form})
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .models import Album
+from .forms import AlbumForm
 
+class AlbumCreateView(CreateView):
+    model = Album
+    form_class = AlbumForm
+    template_name = 'add_album.html'
+    success_url = reverse_lazy('add_album')  # Redirect to the same page after success
 
-#Edit
-def edit_album(request, id):
-    album = models.Album.objects.get(id=id) #here the name of the pk and id, id is fixed
-    album_form = forms.AlbumForm(instance=album)
-    if request.method == "POST":
-        album_form = forms.AlbumForm(request.POST, instance=album)
-        if album_form.is_valid():
-            album_form.save()
-            return redirect('homepage')
-    return render(request, 'add_album.html', {"form" : album_form})
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        return response
 
-#Delete
-def delete_album(request, id):
-    album = models.Album.objects.get(id=id)
-    album.delete()
-    return redirect('homepage')
+class AlbumUpdateView(UpdateView):
+    model = Album
+    form_class = AlbumForm
+    template_name = 'add_album.html'
+    success_url = reverse_lazy('homepage') 
+    def get_object(self):
+        return Album.objects.get(id=self.kwargs['id'])  
+
+class AlbumDeleteView(DeleteView):
+    model = Album
+    template_name = 'confirm_delete.html'  
+    success_url = reverse_lazy('homepage')
+
+    def get_object(self):
+        return Album.objects.get(id=self.kwargs['id']) 
